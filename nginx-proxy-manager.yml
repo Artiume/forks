@@ -1,0 +1,57 @@
+#!/bin/bash
+#
+# Title:      PGBlitz (jlesage/nginx-proxy-manager)
+# Author(s):  MrDoob
+# URL:        https://pgblitz.com - http://github.pgblitz.com
+# GNU:        General Public License v3.0 
+################################################################################
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    # FACTS #######################################################################
+    - name: 'Set Known Facts'
+      set_fact:
+        pgrole: 'nginx-proxy-manager'
+        intport: '8181'
+        extport: '8181'
+        intport2: '8080'
+        extport2: '8091'
+        intport3: '4443'
+        extport3: '4443'		
+        image: 'jlesage/nginx-proxy-managert'
+
+    # CORE (MANDATORY) ############################################################
+    - name: 'Including cron job'
+      include_tasks: '/opt/communityapps/apps/_core.yml'
+
+    - name: 'Setting PG Volumes'
+      set_fact:
+        pg_volumes:
+          - '/opt/appdata/{{pgrole}}:/config:rw'
+          - '{{path.stdout}}:{{path.stdout}}'
+
+    - name: 'Setting PG ENV'
+      set_fact:
+        pg_env:
+          PUID: '1000'
+          PGID: '1000'
+          TZ: '${TZ}'
+          
+    # MAIN DEPLOYMENT #############################################################
+    - name: 'Deploying {{pgrole}}'
+      docker_container:
+        name: '{{pgrole}}'
+        image: '{{image}}'
+        pull: yes
+        published_ports:
+          - '{{ports.stdout}}{{extport}}:{{intport}}'	  
+        volumes: '{{pg_volumes}}'
+        env: '{{pg_env}}'
+        restart_policy: unless-stopped
+        networks:
+          - name: plexguide
+            aliases:
+              - '{{pgrole}}'
+        state: started
+        labels: '{{pg_labels}}'
