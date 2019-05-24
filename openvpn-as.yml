@@ -48,7 +48,7 @@
           TZ: '${TZ}'
           DNS1: '1.1.1.1'
           DNS2: '1.0.0.1'
-          
+
     - name: 'Cap add'
       set_fact:
           cap_add: 'NET_ADMIN'
