@@ -48,7 +48,10 @@
           TZ: '${TZ}'
           DNS1: '1.1.1.1'
           DNS2: '1.0.0.1'
-          cap-add: 'NET_ADMIN'
+          
+    - name: 'Cap add'
+      set_fact:
+          cap_add: 'NET_ADMIN'
 
     # MAIN DEPLOYMENT #############################################################
     - name: 'Deploying {{pgrole}}'
