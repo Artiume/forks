@@ -37,7 +37,7 @@
     - name: 'Setting PG Volumes'
       set_fact:
         pg_volumes:
-          - '/opt/appdata/{{pgrole}}cofig/:/config:rw'
+          - '/opt/appdata/{{pgrole}}/cofig:/config:rw'
           - '/etc/localtime:/etc/localtime:ro'
 
     - name: 'Setting PG ENV'
