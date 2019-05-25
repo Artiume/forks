@@ -33,7 +33,8 @@
     - name: 'Setting PG Volumes'
       set_fact:
         pg_volumes:
-          - '/opt/appdata/{{pgrole}}/home/:/home/:rw'
+          - '/opt/appdata/{{pgrole}}/home:/home:rw'
+          - '/opt/appdata/{{pgrole}}/config:/etc/ssh:ro
           - '{{path.stdout}}:{{path.stdout}}'
           - '/mnt/unionfs:/mnt/unionfs:rw'
           - '/etc/localtime:/etc/localtime:ro'
