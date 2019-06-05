@@ -36,7 +36,7 @@
     - name: 'Setting PG Volumes'
       set_fact:
         pg_volumes:
-          - '/opt/appdata/{{pgrole}}/vsftpd/:/etc/vsftpd/:rw'
+          - '/opt/appdata/{{pgrole}}:/etc/vsftpd/:rw'
           - '/mnt:/home/vsftpd:ro'
           - '/etc/localtime:/etc/localtime:ro'
 
@@ -47,7 +47,7 @@
           PGID: '1000'
           TZ: '${TZ}'
           XFERLOG_STD_FORMAT: 'YES'
-          LOG_STDOUT: '/opt/appdata/{{pgrole}}/vsftpd/log/'
+          LOG_STDOUT: '/opt/appdata/{{pgrole}}/log/'
           FILE_OPEN_MODE: '0650'
           LOCAL_UMASK: '002'
 
