@@ -1,6 +1,7 @@
 version: "3"
 
 # https://github.com/pi-hole/docker-pi-hole/blob/master/README.md
+# https://www.smarthomebeginner.com/run-pihole-in-docker-on-ubuntu-with-reverse-proxy/
 
 services:
   pihole:
