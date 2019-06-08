@@ -72,7 +72,7 @@
         pg_env:
           PUID: '1000'
           PGID: '1000'
-          ServerIP: '"{{ lookup('dig', ansible_host) }}"'
+          ServerIP: '{{ "lookup('dig', ansible_host)" }}'
           PROXY_LOCATION: 'pihole'
           VIRTUAL_HOST: 'pihole.{{domain.stdout}}'
           VIRTUAL_PORT: '80'
