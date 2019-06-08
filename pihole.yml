@@ -62,9 +62,9 @@
         pg_volumes:
           #- '/opt/appdata/{{pgrole}}/data:/data'
           #- '/opt/appdata/{{pgrole}}/database:/database'
-          - '/opt/appdata/{{pgrole}}/etc-pihole:/etc/pihole/'
-          - '/opt/appdata/{{pgrole}}/etc-dnsmasq.d:/etc/dnsmasq.d/'
-        # run `touch ./var-log/pihole.log` first unless you like errors
+          - '/opt/appdata/{{pgrole}}/etc-pihole:/etc/pihole'
+          - '/opt/appdata/{{pgrole}}/etc-dnsmasq.d:/etc/dnsmasq.d'
+          # run `touch ./var-log/pihole.log` first unless you like errors
           - '/opt/appdata/{{pgrole}}/pihole.log:/var/log/pihole.log'
           
     - name: 'Setting PG ENV'
