@@ -66,11 +66,13 @@
           PGID: '1000'
           TZ: '${TZ}'
           XFERLOG_STD_FORMAT: 'YES'
-          LOG_STDOUT: '/opt/appdata/{{pgrole}}/log'
+#This line prevents the program from being able to connect, requires troubleshooting.
+#          LOG_STDOUT: '/opt/appdata/{{pgrole}}/log/'
           FILE_OPEN_MODE: '0650'
           LOCAL_UMASK: '002'   
           FTP_USER: 'admin'
-          FTP_PASS: 'admin'
+# Set your password or run 'docker logs vsftpd' to find out password
+#          FTP_PASS: 'admin'
           PASV_ADDRESS: '127.0.0.1'
           PASV_MIN_PORT: '21100'
           PASV_MAX_PORT: '21110'
