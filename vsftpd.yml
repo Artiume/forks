@@ -19,6 +19,24 @@
         extport2: '55'
         intport3: '21101'
         extport3: '21101'
+        intport4: '21102'
+        extport4: '21102'
+        intport5: '21103'
+        extport5: '21103'
+        intport6: '21104'
+        extport6: '21104'
+        intport7: '21105'
+        extport7: '21105'
+        intport8: '21106'
+        extport8: '21106'
+        intport9: '21107'
+        extport9: '21107'
+        intport10: '21108'
+        extport10: '21108'
+        intport11: '21109'
+        extport11: '21109'
+        intport12: '21110'
+        extport12: '21110'
         image: 'fauria/vsftpd:latest'
 
     # CORE (MANDATORY) ############################################################
@@ -37,7 +55,8 @@
       set_fact:
         pg_volumes:
           - '/opt/appdata/{{pgrole}}:/etc/vsftpd/:rw'
-          - '/mnt:/home/vsftpd:ro'
+          - '/opt/appdata/vsftpd:/home/vsftpd:rw'
+          #- '/mnt:/home/vsftpd:ro'
           - '/etc/localtime:/etc/localtime:ro'
 
     - name: 'Setting PG ENV'
@@ -49,7 +68,12 @@
           XFERLOG_STD_FORMAT: 'YES'
           LOG_STDOUT: '/opt/appdata/{{pgrole}}/log/'
           FILE_OPEN_MODE: '0650'
-          LOCAL_UMASK: '002'
+          LOCAL_UMASK: '002'   
+          FTP_USER: 'admin'
+          FTP_PASS: 'admin'
+          PASV_ADDRESS: '127.0.0.1'
+          PASV_MIN_PORT: '21100'
+          PASV_MAX_PORT: '21110'
 
     # MAIN DEPLOYMENT #############################################################
     - name: 'Deploying {{pgrole}}'
