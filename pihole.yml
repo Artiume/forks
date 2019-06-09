@@ -9,7 +9,7 @@
 ################################################################################
 ---
 - hosts: localhost
-  gather_facts: false
+  gather_facts: true
   tasks:
     # FACTS #######################################################################
     
@@ -19,18 +19,48 @@
         intport: '80'
         extport: '9080'
         intport2: '53/udp'
-        extport2: '53/udp'
+        extport2: '53'
         intport3: '67/udp'
-        extport3: '67/udp'
+        extport3: '67'
         intport4: '53/tcp'
-        extport4: '53/tcp'
+        extport4: '53'
         intport5: '443'
         extport5: '9443'
         image: 'pihole/pihole:latest'
 
+    - name: Get Host's IP Address
+      setup:
+        filter: ansible_default_ipv4.address
+
+    # UBUNTU SPECIAL ##############################################################
+
+    - name: Disable systemd-resolved.service in Ubuntu OS's
+      service:
+        name: systemd-resolved.service
+        enabled: no
+      when: ansible_distribution == 'Ubuntu'
+
+    - name: Stop systemd-resolved.service in Ubuntu OS's
+      service:
+        name: systemd-resolved.service
+        state: stopped
+      when: ansible_distribution == 'Ubuntu'
+
+    - name: Insert "dns=default" into NetworkManager.cong 
+      lineinfile:
+        path: /etc/NetworkManager/NetworkManager.conf
+        line: dns=default
+        insertafter: plugins=ifupdown,keyfile
+      when: ansible_distribution == 'Ubuntu'
+
     # CORE (MANDATORY) ############################################################
     - name: 'Including cron job'
       include_tasks: '/opt/communityapps/apps/_core.yml'
+
+    # ENVIRONMENT VARIABLES #######################################################
+
+    - name: 'Adding Environmental Variables'
+      include_tasks: '/opt/mycontainers/.env'
 
     # LABELS ######################################################################
     - name: 'Adding Traefik'
@@ -52,19 +82,17 @@
           #traefik.frontend.headers.frameDeny: 'true'
 
     # PRETASKS ####################################################################
-    - name: Check log exists
-      stat:
-        path: '/opt/appdata/{{pgrole}}/pihole.log'
-      register: logfile
+
+    - name: Create file
+      command: touch /opt/appdata/{{pgrole}}/pihole.log
+      args:
+        creates: /opt/appdata/{{pgrole}}/pihole.log
 
     - name: 'Setting PG Volumes'
       set_fact:
         pg_volumes:
-          #- '/opt/appdata/{{pgrole}}/data:/data'
-          #- '/opt/appdata/{{pgrole}}/database:/database'
           - '/opt/appdata/{{pgrole}}/etc-pihole:/etc/pihole'
           - '/opt/appdata/{{pgrole}}/etc-dnsmasq.d:/etc/dnsmasq.d'
-          # run `touch ./var-log/pihole.log` first unless you like errors
           - '/opt/appdata/{{pgrole}}/pihole.log:/var/log/pihole.log'
           
     - name: 'Setting PG ENV'
@@ -72,7 +100,7 @@
         pg_env:
           PUID: '1000'
           PGID: '1000'
-          ServerIP: '{{ "lookup('dig', ansible_host)" }}'
+          ServerIP: '{{ansible_default_ipv4.address}}'
           PROXY_LOCATION: 'pihole'
           VIRTUAL_HOST: 'pihole.{{domain.stdout}}'
           VIRTUAL_PORT: '80'
@@ -90,7 +118,13 @@
       docker_container:
         name: '{{pgrole}}'
         image: '{{image}}'
-        pull: yes
+        published_ports:
+          - '{{ports.stdout}}{{extport}}:{{intport}}'
+          - '{{extport2}}:{{intport2}}'
+          - '{{extport3}}:{{intport3}}'
+          - '{{extport4}}:{{intport4}}'
+          - '{{extport5}}:{{intport5}}'  
+        #pull: yes
         volumes: '{{pg_volumes}}'
         env: '{{pg_env}}'
         restart_policy: unless-stopped
@@ -100,3 +134,14 @@
               - '{{pgrole}}'
         state: started
         labels: '{{pg_labels}}'
+       # '{{env_args}}'
+
+    - name: remove and backup /etc/resolv.conf for Ubuntu
+      command: mv /etc/resolv.conf /etc/resolv.conf.bak
+      when: ansible_distribution == 'Ubuntu'
+      
+    - name: Restart NetworkManager in Ubuntu OS's
+      service:
+        name: network-manager.service
+        state: restarted
+      when: ansible_distribution == 'Ubuntu'
