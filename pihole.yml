@@ -75,6 +75,7 @@
           traefik.enable: 'true'
           traefik.backend: "{{pgrole}}"
           traefik.port: '80'
+          traefik.frontend.auth.forward.address: '{{gauth}}'
           traefik.frontend.rule: 'HostRegexp:pihole.{{domain.stdout}},{catchall:.*}'
           traefik.frontend.priority: '1'
           traefik.frontend.headers.SSLRedirect: 'true'
