@@ -58,9 +58,15 @@
       include_tasks: '/opt/communityapps/apps/_core.yml'
 
     # ENVIRONMENT VARIABLES #######################################################
-
-    - name: 'Adding Environmental Variables'
-      include_tasks: '/opt/mycontainers/.env'
+##Environmental Argument File
+#    - name: 'Adding Environmental Variables'
+#      include_tasks: '/opt/mycontainers/.env'
+#
+#Environmental Arguments.
+#    - name: 'Adding Environmental Variables'
+#      set_fact:
+#        env_args:
+#          --dns=127.0.0.1 --dns=1.1.1.1
 
     # LABELS ######################################################################
     - name: 'Adding Traefik'
@@ -83,7 +89,7 @@
 
     # PRETASKS ####################################################################
 
-    - name: Create file
+    - name: Create pihole.log file
       command: touch /opt/appdata/{{pgrole}}/pihole.log
       args:
         creates: /opt/appdata/{{pgrole}}/pihole.log
@@ -134,8 +140,7 @@
               - '{{pgrole}}'
         state: started
         labels: '{{pg_labels}}'
-       # '{{env_args}}'
-
+        
     - name: remove and backup /etc/resolv.conf for Ubuntu
       command: mv /etc/resolv.conf /etc/resolv.conf.bak
       when: ansible_distribution == 'Ubuntu'
